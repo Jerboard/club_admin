@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import User, Info, Payment, Admin, Statistic, Action_journal, Alter_pay_method
+from .models import User, Info, Payment, Admin, Statistic, ActionJournal, AlterPayMethod
 
 
 @admin.register(User)
@@ -59,7 +59,7 @@ class Veiw_Admin_Table(admin.ModelAdmin):
     search_fields = ['date']
 
 
-@admin.register(Action_journal)
+@admin.register(ActionJournal)
 class Veiw_Admin_Table(admin.ModelAdmin):
     list_display = ['time', 'user_full_name', 'status', 'action', 'comment']
     search_fields = ['time', 'user_id', 'status', 'action', 'comment']
@@ -78,7 +78,7 @@ class Veiw_Admin_Table(admin.ModelAdmin):
     user_full_name.short_description = 'Пользователь'
 
 
-@admin.register(Alter_pay_method)
+@admin.register(AlterPayMethod)
 class Veiw_Admin_Table(admin.ModelAdmin):
     list_display = ['orm_id', 'name', 'is_active']
 

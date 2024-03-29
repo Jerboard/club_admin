@@ -102,7 +102,7 @@ class Statistic(models.Model):
         managed = False
 
 
-class Action_journal(models.Model):
+class ActionJournal(models.Model):
     id = models.AutoField (primary_key=True)
     time = models.DateTimeField('Время', null=True, blank=True)
     user_id = models.BigIntegerField('ID пользователя', null=True, blank=True)
@@ -120,7 +120,7 @@ class Action_journal(models.Model):
         managed = False
 
 
-class Alter_pay_method(models.Model):
+class AlterPayMethod(models.Model):
     id = models.AutoField (primary_key=True)
     orm_id = models.IntegerField('ID в системе', null=True, blank=True, default=0)
     name = models.CharField('Название', max_length=255, null=True, blank=True)
