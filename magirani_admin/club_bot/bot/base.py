@@ -13,7 +13,7 @@ bot = telebot.TeleBot(BOT_TOKEN, parse_mode='html')
 def log_error(message, with_traceback: bool = True):
     now = datetime.now(TZ)
     log_folder = now.strftime ('%m-%Y')
-    log_path = os.path.join(BASE_DIR, 'club_bot', 'bot', '../bot_log', log_folder)
+    log_path = os.path.join(BASE_DIR, 'club_bot', 'bot', 'bot_log', log_folder)
 
     if not os.path.exists(log_path):
         os.makedirs(log_path)
