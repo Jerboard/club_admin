@@ -8,12 +8,9 @@ from club_bot.enums import UserStatus, RecurrentStatus
 from magirani_admin.settings import DATE_FORMAT, CHANNEL_ID
 
 
-def send_message_admin(user_id: int):
+def send_message_admin(text: str):
     try:
-        print(user_id)
-        bot.send_message(chat_id=user_id, text='test')
-        log_text = f'Сообщение отправлено {user_id}'
-        log_error(log_text, with_traceback=False)
+        bot.send_message(chat_id=524275902, text=text, disable_notification=True)
     except Exception as ex:
         log_error(ex)
 
