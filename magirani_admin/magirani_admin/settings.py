@@ -2,10 +2,12 @@ from pathlib import Path
 from decouple import config
 
 import os
+import pytz
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY')
+BOT_TOKEN = config('BOT_TOKEN')
 
 DEBUG = bool(int(config('DEBUG')))
 ALLOWED_HOSTS = ['*']
@@ -25,7 +27,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -92,6 +94,10 @@ AUTH_PASSWORD_VALIDATORS = [
 LANGUAGE_CODE = 'ru-ru'
 
 TIME_ZONE = 'Europe/Moscow'
+TZ = pytz.timezone(TIME_ZONE)
+DATE_FORMAT = '%d.%m.%Y'
+CHANNEL_ID = config('CHANNEL_ID')
+
 
 USE_I18N = True
 
