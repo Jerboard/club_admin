@@ -57,10 +57,10 @@ def simple_payment(request: HttpRequest):
                 user_status=user_status
             )
 
-        elif request_data['Event'] == "3DS":
-            payment = PaymentPS.objects.filter (order_id=request_data['OrderId']).first ()
-            payment.transaction_id = request_data ['TransactionId']
-            payment.save ()
+        # elif request_data['Event'] == "3DS":
+        #     payment = PaymentPS.objects.filter (order_id=request_data['OrderId']).first ()
+        #     payment.transaction_id = request_data ['TransactionId']
+        #     payment.save ()
 
         response_info = {'info': 'successfully'}
 
@@ -81,12 +81,13 @@ def recurrent_payment(request: HttpRequest):
         request_data: dict = json.loads(request.body)
         user_id = int(request_data['AccountId'])
         if request_data['RecurringStatus'] == RecurrentStatus.NEW.value:
-            payment = PaymentPS.objects.filter (transaction_id=request_data ['TransactionId']).first ()
-            payment.recurring_id = request_data.get ('RecurringId')
-            payment.save ()
+            # payment = PaymentPS.objects.filter (transaction_id=request_data ['TransactionId']).first ()
+            # payment.recurring_id = request_data.get ('RecurringId')
+            # payment.save ()
 
             user_info = User.objects.filter (user_id=user_id).first ()
             user_info.recurrent = True
+            user_info.last_pay_id = request_data.get ('RecurringId')
             user_info.save ()
 
         elif request_data['RecurringStatus'] == RecurrentStatus.ACTIVE.value:
