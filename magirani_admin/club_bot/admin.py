@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import User, Info, Payment, Admin, Statistic, ActionJournal, AlterPayMethod
+from .models import User, Info, Payment, Admin, Statistic, ActionJournal, AlterPayMethod, PaymentPS
 
 
 @admin.register(User)
@@ -30,6 +30,24 @@ class Veiw_Admin_Table(admin.ModelAdmin):
 class Veiw_Admin_Table(admin.ModelAdmin):
     list_display = ['user_full_name', 'date', 'total_amount', 'tg_payment_id']
     search_fields = ['user_id']
+
+    def user_full_name(self, obj):
+        user = User.objects.filter(user_id=obj.user_id).first()
+        if not user:
+            return None
+        if user.full_name:
+            return user.full_name
+        else:
+            return str(obj.user_id)
+
+    user_full_name.short_description = 'Пользователь'
+
+
+#    оплата пейселекшон
+@admin.register(PaymentPS)
+class Veiw_Admin_Table(admin.ModelAdmin):
+    list_display = ['user_full_name', 'created_at', 'amount', 'transaction_id']
+    search_fields = ['user_id', 'rebill_id']
 
     def user_full_name(self, obj):
         user = User.objects.filter(user_id=obj.user_id).first()
