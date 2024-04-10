@@ -16,6 +16,11 @@ class RecurrentStatus(str, Enum):
     TERMINATED = 'terminated'
 
 
+class PaymentStatus(str, Enum):
+    SUCCESSFULLY = 'successfully'
+    FAILED = 'failed'
+
+
 class BaseCB(str, Enum):
     BACK_COM_START = 'back_com_start'
     CLOSE = 'close'
