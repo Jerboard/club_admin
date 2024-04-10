@@ -89,28 +89,37 @@ def simple_payment(request: HttpRequest):
 
 
 def recurrent_payment(request: HttpRequest):
-    text = f'recurrent_payment\n\nheader===\n{request.headers}\n\nbody===\n{request.body}'
-    bot.send_message_admin (text)
-    log_error(message=request.body, with_traceback=False)
-    request_data = json.loads(request.body)
-    user_id = int(request_data['AccountId'])
-    if request_data['RecurringStatus'] == RecurrentStatus.NEW.value:
-        user_info = User.objects.filter (user_id=user_id).first ()
-        user_info.recurrent = True
-        user_info.save ()
+    response_info = {'info': 'bad request'}
+    try:
+        text = f'recurrent_payment\n\nheader===\n{request.headers}\n\nbody===\n{request.body}'
+        bot.send_message_admin (text)
+        log_error(message=request.body, with_traceback=False)
+        request_data = json.loads(request.body)
+        user_id = int(request_data['AccountId'])
+        if request_data['RecurringStatus'] == RecurrentStatus.NEW.value:
+            user_info = User.objects.filter (user_id=user_id).first ()
+            user_info.recurrent = True
+            user_info.save ()
 
-    elif request_data['RecurringStatus'] == RecurrentStatus.ACTIVE.value:
-        pass
+        elif request_data['RecurringStatus'] == RecurrentStatus.ACTIVE.value:
+            pass
 
-    elif request_data['RecurringStatus'] == RecurrentStatus.OVERDUE.value:
-        pass
+        elif request_data['RecurringStatus'] == RecurrentStatus.OVERDUE.value:
+            pass
 
-    elif request_data['RecurringStatus'] == RecurrentStatus.TERMINATED.value:
-        pass
+        elif request_data['RecurringStatus'] == RecurrentStatus.TERMINATED.value:
+            pass
 
-    else:
-        return JsonResponse({'info': 'bad request'})
+        else:
+            pass
 
+        response_info = {'info': 'successfully'}
+
+    except Exception as ex:
+        log_error (ex)
+
+    finally:
+        return JsonResponse (response_info)
 
 # удачная оплата с подключением реккурента
 '''
