@@ -12,7 +12,7 @@ from club_bot.bot.base import log_error
 
 # принимает инфу в апи
 def simple_payment(request: HttpRequest):
-    response = {'info': 'bad request'}
+    response_info = {'info': 'bad request'}
 
     text = f'simple_payment\n\nheader===\n{request.headers}\n\nbody===\n{request.body}'
     bot.send_message_admin(text)
@@ -54,13 +54,13 @@ def simple_payment(request: HttpRequest):
                 user_status=user_status
             )
 
-        response = {'info': 'successfully'}
+        response_info = {'info': 'successfully'}
 
     except Exception as ex:
         log_error(ex)
 
     finally:
-        return JsonResponse(response)
+        return JsonResponse(response_info)
 
 
 # обычная оплата без реккурента
