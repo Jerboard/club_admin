@@ -12,8 +12,11 @@ from club_bot.bot.base import log_error
 
 # принимает инфу в апи
 def simple_payment(request: HttpRequest):
-    text = f'header===\n{request.headers}\n\nbody===\n{request.body}'
+    response = {'info': 'bad request'}
+
+    text = f'simple_payment\n\nheader===\n{request.headers}\n\nbody===\n{request.body}'
     bot.send_message_admin(text)
+    log_error (message=request.body, with_traceback=False)
     try:
         request_data = json.loads(request.body)
         log_error(request.headers, with_traceback=False)
@@ -49,13 +52,14 @@ def simple_payment(request: HttpRequest):
                 new_kick_date=new_kick_date,
                 user_status=user_status
             )
-            return JsonResponse({'info': 'successfully'}, status=200)
+
+        response = {'info': 'successfully'}
 
     except Exception as ex:
         log_error(ex)
 
     finally:
-        return JsonResponse({'info': 'bad request'})
+        return JsonResponse(response)
 
 
 # обычная оплата без реккурента
@@ -84,33 +88,15 @@ def simple_payment(request: HttpRequest):
 
 
 def recurrent_payment(request: HttpRequest):
-    log_error(message=request.headers, with_traceback=False)
+    text = f'recurrent_payment\n\nheader===\n{request.headers}\n\nbody===\n{request.body}'
+    bot.send_message_admin (text)
     log_error(message=request.body, with_traceback=False)
     request_data = json.loads(request.body)
     user_id = int(request_data['AccountId'])
     if request_data['RecurringStatus'] == RecurrentStatus.NEW.value:
-        payment = PaymentPS.objects.filter (user_id=user_id, status=RecurrentStatus.NEW.value).first ()
-
-        payment.status = 'success'
-        payment.transaction_id = request_data ['TransactionId']
-        payment.rebill_id = request_data ['RebillId']
-        payment.save ()
-
         user_info = User.objects.filter (user_id=user_id).first ()
-
-        new_kick_date = add_months (count_mounts=1, kick_date=user_info.kick_date)
-        user_info.kick_date = new_kick_date
-        user_info.tariff = '1500'
-        user_info.status = 'sub'
         user_info.recurrent = True
         user_info.save ()
-
-        bot.success_payment (
-            user_id=user_id,
-            message_id=message_id,
-            new_kick_date=new_kick_date,
-            user_status=user_status
-        )
 
     elif request_data['RecurringStatus'] == RecurrentStatus.ACTIVE.value:
         pass
