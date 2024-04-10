@@ -46,8 +46,13 @@ class Veiw_Admin_Table(admin.ModelAdmin):
 #    оплата пейселекшон
 @admin.register(PaymentPS)
 class Veiw_Admin_Table(admin.ModelAdmin):
-    list_display = ['user_full_name', 'created_at', 'amount', 'transaction_id']
+    list_display = ['user_full_name', 'created_at', 'amount', 'transaction_id', 'recurrent_payment']
     search_fields = ['user_id', 'rebill_id']
+
+    def recurrent_payment(self, obj):
+        return True if obj.recurring_id else False
+
+    recurrent_payment.short_description = 'Рекуррент'
 
     def user_full_name(self, obj):
         user = User.objects.filter(user_id=obj.user_id).first()

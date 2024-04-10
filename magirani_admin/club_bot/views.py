@@ -20,11 +20,12 @@ def simple_payment(request: HttpRequest):
     # log_error (message=request.body, with_traceback=False)
     # bot.send_message_admin ('Прошёл лог')
     try:
-        request_data = json.loads(request.body)
+        request_data: dict = json.loads(request.body)
         if request_data['Event'] == "Payment":
             user_id, add_mounts_count, tariff, chat_id, message_id = map(int, request_data['Description'].split(':'))
             order_id = request_data['OrderId']
             rebill_id = request_data.get ('RebillId')
+            recurring_id = request_data.get ('RecurringId')
 
             check_payment = PaymentPS.objects.filter (transaction_id=request_data['TransactionId']).first ()
             if check_payment:
@@ -35,6 +36,7 @@ def simple_payment(request: HttpRequest):
 
             payment.status = PaymentStatus.SUCCESSFULLY.value
             payment.transaction_id = request_data['TransactionId']
+            payment.recurring_id = recurring_id
             payment.rebill_id = rebill_id
             payment.save()
 
@@ -45,7 +47,9 @@ def simple_payment(request: HttpRequest):
             user_info.kick_date = new_kick_date
             user_info.tariff = tariff
             user_info.status = 'sub'
+            user_info.last_pay_id = recurring_id
             user_info.recurrent = False
+            user_info.alarm_2_day = False
             user_info.save()
 
             # photo = PhotosTable.objects.order_by("?").first()
@@ -84,6 +88,7 @@ def recurrent_payment(request: HttpRequest):
 
             new_kick_date = add_months (count_mounts=1, kick_date=user_info.kick_date)
             user_info.kick_date = new_kick_date
+            user_info.alarm_2_day = False
             user_info.save ()
 
             new_payment = PaymentPS(

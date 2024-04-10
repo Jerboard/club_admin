@@ -148,6 +148,7 @@ class PaymentPS(models.Model):
     recurring_id = models.CharField(max_length=255)
     transaction_id = models.CharField(max_length=255)
     pay_link = models.CharField(max_length=255)
+    card_type = models.CharField(max_length=255)
 
     def __str__(self):
         return self.order_id
