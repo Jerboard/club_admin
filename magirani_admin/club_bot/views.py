@@ -17,6 +17,7 @@ def simple_payment(request: HttpRequest):
     text = f'simple_payment\n\nheader===\n{request.headers}\n\nbody===\n{request.body}'
     bot.send_message_admin(text)
     log_error (message=request.body, with_traceback=False)
+    bot.send_message_admin ('Прошёл лог')
     try:
         request_data = json.loads(request.body)
         log_error(request.headers, with_traceback=False)
