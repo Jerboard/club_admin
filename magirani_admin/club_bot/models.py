@@ -138,17 +138,17 @@ class AlterPayMethod(models.Model):
 
 class PaymentPS(models.Model):
     id = models.AutoField(primary_key=True)
-    user_id = models.BigIntegerField()
-    created_at = models.DateTimeField()
-    amount = models.IntegerField()
-    order_id = models.CharField(max_length=255)
-    status = models.CharField(max_length=255, default='new')
+    user_id = models.BigIntegerField(null=True, blank=True)
+    created_at = models.DateTimeField(null=True, blank=True)
+    amount = models.IntegerField(null=True, blank=True)
+    order_id = models.CharField(max_length=255, null=True, blank=True)
+    status = models.CharField(max_length=255, default='new', null=True, blank=True)
     # pay_id = models.CharField(max_length=255)
-    rebill_id = models.CharField(max_length=255)
-    recurring_id = models.CharField(max_length=255)
-    transaction_id = models.CharField(max_length=255)
-    pay_link = models.CharField(max_length=255)
-    card_type = models.CharField(max_length=255)
+    rebill_id = models.CharField(max_length=255, null=True, blank=True)
+    recurring_id = models.CharField(max_length=255, null=True, blank=True)
+    transaction_id = models.CharField(max_length=255, null=True, blank=True)
+    pay_link = models.CharField(max_length=255, null=True, blank=True)
+    card_type = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
         return self.order_id

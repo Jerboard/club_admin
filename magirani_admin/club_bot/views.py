@@ -56,6 +56,12 @@ def simple_payment(request: HttpRequest):
                 new_kick_date=new_kick_date,
                 user_status=user_status
             )
+
+        elif request_data['Event'] == "3DS":
+            payment = PaymentPS.objects.filter (order_id=request_data['OrderId']).first ()
+            payment.transaction_id = request_data ['TransactionId']
+            payment.save ()
+
         response_info = {'info': 'successfully'}
 
     except Exception as ex:
