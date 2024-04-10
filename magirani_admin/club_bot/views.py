@@ -12,7 +12,8 @@ from club_bot.bot.base import log_error
 
 # принимает инфу в апи
 def simple_payment(request: HttpRequest):
-    bot.send_message_admin(request.body)
+    text = f'header===\n{request.headers}\n\nbody===\n{request.body}'
+    bot.send_message_admin(text)
     try:
         request_data = json.loads(request.body)
         log_error(request.headers, with_traceback=False)
