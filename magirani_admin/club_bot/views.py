@@ -44,7 +44,7 @@ def simple_payment(request: HttpRequest):
             user_info.kick_date = new_kick_date
             user_info.tariff = tariff
             user_info.status = 'sub'
-            user_info.recurrent = False
+            user_info.recurrent = True if tariff == '1500' else False
             user_info.alarm_2_day = False
             user_info.save()
 
