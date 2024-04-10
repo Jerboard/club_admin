@@ -143,7 +143,7 @@ class PaymentPS(models.Model):
     amount = models.IntegerField()
     order_id = models.CharField(max_length=255)
     status = models.CharField(max_length=255, default='new')
-    pay_id = models.CharField(max_length=255)
+    # pay_id = models.CharField(max_length=255)
     rebill_id = models.CharField(max_length=255)
     recurring_id = models.CharField(max_length=255)
     transaction_id = models.CharField(max_length=255)

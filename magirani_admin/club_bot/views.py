@@ -15,17 +15,15 @@ from club_bot.bot.base import log_error
 def simple_payment(request: HttpRequest):
     response_info = {'info': 'bad request'}
 
-    # text = f'simple_payment\n\nheader===\n{request.headers}\n\nbody===\n{request.body}'
-    # bot.send_message_admin(text)
-    # log_error (message=request.body, with_traceback=False)
-    # bot.send_message_admin ('Прошёл лог')
+    text = f'simple_payment\n{request.body}'
+    log_error (message=text, with_traceback=False)
     try:
         request_data: dict = json.loads(request.body)
         if request_data['Event'] == "Payment":
             user_id, add_mounts_count, tariff, chat_id, message_id = map(int, request_data['Description'].split(':'))
             order_id = request_data['OrderId']
             rebill_id = request_data.get ('RebillId')
-            recurring_id = request_data.get ('RecurringId')
+            # recurring_id = request_data.get ('RecurringId')
 
             check_payment = PaymentPS.objects.filter (transaction_id=request_data['TransactionId']).first ()
             if check_payment:
@@ -36,7 +34,6 @@ def simple_payment(request: HttpRequest):
 
             payment.status = PaymentStatus.SUCCESSFULLY.value
             payment.transaction_id = request_data['TransactionId']
-            payment.recurring_id = recurring_id
             payment.rebill_id = rebill_id
             payment.save()
 
@@ -47,7 +44,6 @@ def simple_payment(request: HttpRequest):
             user_info.kick_date = new_kick_date
             user_info.tariff = tariff
             user_info.status = 'sub'
-            user_info.last_pay_id = recurring_id
             user_info.recurrent = False
             user_info.alarm_2_day = False
             user_info.save()
@@ -72,13 +68,17 @@ def simple_payment(request: HttpRequest):
 # списание реккурента
 def recurrent_payment(request: HttpRequest):
     response_info = {'info': 'bad request'}
+
+    text = f'recurrent_payment\n{request.body}'
+    log_error (message=text, with_traceback=False)
     try:
-        # text = f'recurrent_payment\n\nheader===\n{request.headers}\n\nbody===\n{request.body}'
-        # bot.send_message_admin (text)
-        # log_error(message=request.body, with_traceback=False)
         request_data: dict = json.loads(request.body)
         user_id = int(request_data['AccountId'])
         if request_data['RecurringStatus'] == RecurrentStatus.NEW.value:
+            payment = PaymentPS.objects.filter (transaction_id=request_data ['TransactionId']).first ()
+            payment.recurring_id = request_data.get ('RecurringId')
+            payment.save ()
+
             user_info = User.objects.filter (user_id=user_id).first ()
             user_info.recurrent = True
             user_info.save ()

@@ -50,7 +50,7 @@ class Veiw_Admin_Table(admin.ModelAdmin):
     search_fields = ['user_id', 'rebill_id']
 
     def recurrent_payment(self, obj):
-        return True if obj.recurring_id else False
+        return 'Да' if obj.recurring_id else 'Нет'
 
     recurrent_payment.short_description = 'Рекуррент'
 
