@@ -5,10 +5,11 @@ from datetime import datetime
 import json
 
 from club_bot import bot
-from club_bot.models import PaymentPS, User, PhotosTable
+from club_bot.models import PaymentPS, User, ActionJournal
 from club_bot.utils import add_months
 from club_bot.enums import RecurrentStatus, PaymentStatus, UserStatus
 from club_bot.bot.base import log_error
+from club_bot.payselection_api import stop_recurrent
 
 
 # списание обычной оплаты
@@ -57,6 +58,27 @@ def simple_payment(request: HttpRequest):
                 user_status=user_status
             )
 
+            new_node = ActionJournal (
+                time=datetime.now (),
+                user_id=user_id,
+                status=PaymentStatus.SUCCESSFULLY.value,
+                action='Оплата'
+            )
+            new_node.save ()
+
+        elif request_data['Event'] == "Fail":
+            user_id, add_mounts_count, tariff, chat_id, message_id = map (int, request_data ['Description'].split (':'))
+            new_node = ActionJournal(
+                time=datetime.now(),
+                user_id=user_id,
+                status=PaymentStatus.FAILED.value,
+                action='Оплата',
+                comment=(f'{request_data.get("Brand")} {request_data.get("Bank")} '
+                         f'{request_data.get("Amount")} {request_data.get("Currency")}\n'
+                         f'{request_data.get("ClientMessage")}')
+            )
+            new_node.save()
+
         # elif request_data['Event'] == "3DS":
         #     payment = PaymentPS.objects.filter (order_id=request_data['OrderId']).first ()
         #     payment.transaction_id = request_data ['TransactionId']
@@ -77,18 +99,27 @@ def recurrent_payment(request: HttpRequest):
 
     text = f'recurrent_payment\n{request.body}'
     log_error (message=text, with_traceback=False)
+
+    status = None
+    comment = None
     try:
         request_data: dict = json.loads(request.body)
         user_id = int(request_data['AccountId'])
         if request_data['RecurringStatus'] == RecurrentStatus.NEW.value:
-            # payment = PaymentPS.objects.filter (transaction_id=request_data ['TransactionId']).first ()
-            # payment.recurring_id = request_data.get ('RecurringId')
-            # payment.save ()
+            payment = PaymentPS.objects.filter (order_id=request_data ['Description']).first ()
+            payment.recurring_id = request_data.get ('RecurringId')
+            payment.save ()
 
             user_info = User.objects.filter (user_id=user_id).first ()
+            if user_info.recurrent:
+                stop_recurrent(recurring_id=user_info.last_pay_id)
+
             user_info.recurrent = True
             user_info.last_pay_id = request_data.get ('RecurringId')
             user_info.save ()
+
+            status = PaymentStatus.SUCCESSFULLY.value
+            comment = 'Новый рекуррент'
 
         elif request_data['RecurringStatus'] == RecurrentStatus.ACTIVE.value:
             user_info = User.objects.filter (user_id=user_id).first ()
@@ -109,10 +140,14 @@ def recurrent_payment(request: HttpRequest):
             )
             new_payment.save()
 
+            status = PaymentStatus.SUCCESSFULLY.value
+
         elif request_data['RecurringStatus'] == RecurrentStatus.OVERDUE.value:
             text = 'Неудачное списание рекуррента. Пополните баланс и т.д.'
 
             bot.send_info_message(user_id=user_id, text=text)
+
+            status = PaymentStatus.FAILED.value
 
         elif request_data['RecurringStatus'] == RecurrentStatus.TERMINATED.value:
             user_info = User.objects.filter (user_id=user_id).first ()
@@ -125,8 +160,21 @@ def recurrent_payment(request: HttpRequest):
 
             bot.send_info_message (user_id=user_id, text=text)
 
+            status = PaymentStatus.FAILED.value
+            comment = 'Отмена рекуррента'
+
         else:
             pass
+
+        if status:
+            new_node = ActionJournal (
+                time=datetime.now (),
+                user_id=user_id,
+                status=status,
+                action='Списание рекуррента',
+                comment=comment
+            )
+            new_node.save ()
 
         response_info = {'info': 'successfully'}
 
@@ -135,6 +183,7 @@ def recurrent_payment(request: HttpRequest):
 
     finally:
         return JsonResponse (response_info)
+
 
 # удачная оплата с подключением реккурента
 '''
@@ -263,3 +312,27 @@ def recurrent_payment(request: HttpRequest):
   "ClientMessage": "Недостаточно средств на карте"
 '''
 
+# ошибка оплаты
+'''
+  "Event": "Fail",
+  "Amount": "10.00",
+  "Currency": "RUB",
+  "DateTime": "09.04.2024 20.30.35",
+  "IsTest": 0,
+  "Email": "dgushch@gmail.com",
+  "Brand": "MASTERCARD",
+  "Bank": "SBERBANK OF RUSSIA",
+  "CountryCodeAlpha2": "RU",
+  "TransactionId": "PS00000418936538",
+  "OrderId": "524275902-4000-2",
+  "Description": "524275902:3:4000:524275902:415",
+  "Service_Id": "22029",
+  "PaymentMethod": "Card",
+  "CardMasked": "533669******3348",
+  "ErrorMessage": "Insufficient funds",
+  "ExpirationDate": "05/22",
+  "RRN": "024845822295",
+  "CardHolder": "User Userovich",
+  "ErrorCode": "7008",
+  "ClientMessage": "Недостаточно средств на карте"
+'''

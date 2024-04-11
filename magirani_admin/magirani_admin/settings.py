@@ -107,3 +107,14 @@ STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+ps_pay_data = {
+    'shop_id': {
+        'rub': config('PS_SHOP_ID_RUB'),
+        'som': config('PS_SHOP_ID_SOM')
+    },
+    'secret_key': {
+        'rub': config('PS_KEY_RUB'),
+        'som': config('PS_KEY_SOM')
+    }
+}
