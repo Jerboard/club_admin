@@ -20,7 +20,6 @@ class Veiw_Admin_Table(admin.ModelAdmin):
     last_payment_datetime.short_description = 'Последняя оплата'
 
 
-
 @admin.register(Info)
 class Veiw_Admin_Table(admin.ModelAdmin):
     list_display = ['cost_1', 'cost_3', 'cost_6', 'cost_12']
@@ -84,12 +83,11 @@ class Veiw_Admin_Table(admin.ModelAdmin):
 
 @admin.register(ActionJournal)
 class Veiw_Admin_Table(admin.ModelAdmin):
-    list_display = ['time', 'user_full_name', 'status', 'action', 'comment']
+    list_display = ['time', 'user_id', 'user_full_name', 'username', 'status', 'action', 'comment']
     search_fields = ['time', 'user_id', 'status', 'action', 'comment']
     list_filter = ('action', 'status')
 
     def user_full_name(self, obj):
-        print(obj.user_id)
         user = User.objects.filter(user_id=obj.user_id).first()
         if not user:
             return None
@@ -98,6 +96,16 @@ class Veiw_Admin_Table(admin.ModelAdmin):
         else:
             return str (obj.user_id)
 
+    def username(self, obj):
+        user = User.objects.filter(user_id=obj.user_id).first()
+        if not user:
+            return None
+        elif user.username:
+            return user.full_name
+        else:
+            return '-'
+
+    username.short_description = 'Юзернейм'
     user_full_name.short_description = 'Пользователь'
 
 
