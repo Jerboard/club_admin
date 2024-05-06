@@ -101,7 +101,7 @@ class Veiw_Admin_Table(admin.ModelAdmin):
         if not user:
             return None
         elif user.username:
-            return user.full_name
+            return user.username
         else:
             return '-'
 
