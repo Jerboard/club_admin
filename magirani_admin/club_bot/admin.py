@@ -58,11 +58,12 @@ class Veiw_Admin_Table(admin.ModelAdmin):
     def user_full_name(self, obj):
         user = User.objects.filter(user_id=obj.user_id).first()
         if not user:
-            return None
-        if user.full_name:
-            return user.full_name
+            return 'нет данных'
+        full_name = user.full_name.strip () if user.full_name else None
+        if full_name:
+            return full_name
         else:
-            return str(obj.user_id)
+            return str (obj.user_id)
 
     user_full_name.short_description = 'Пользователь'
 
@@ -92,9 +93,10 @@ class Veiw_Admin_Table(admin.ModelAdmin):
     def user_full_name(self, obj):
         user = User.objects.filter(user_id=obj.user_id).first()
         if not user:
-            return None
-        elif user.full_name:
-            return user.full_name
+            return 'нет данных'
+        full_name = user.full_name.strip () if user.full_name else None
+        if full_name:
+            return full_name
         else:
             return str (obj.user_id)
 
