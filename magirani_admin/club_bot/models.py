@@ -108,7 +108,7 @@ class ActionJournal(models.Model):
     user_id = models.BigIntegerField('ID пользователя', null=True, blank=True)
     status = models.CharField('Статус', max_length=100, null=True, blank=True)
     action = models.CharField('Действие', max_length=100, null=True, blank=True)
-    comment = models.CharField('Комментарий', max_length=100, null=True, blank=True)
+    comment = models.TextField('Комментарий', max_length=100, null=True, blank=True)
 
     def __str__(self):
         return self.action
